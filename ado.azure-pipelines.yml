@@ -1,0 +1,39 @@
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+- stage: Kubernetes_BoM
+  jobs:
+  - job: Generate_BoM
+    steps:
+    - task: Kubernetes@1
+      displayName: "Connect to AKS"
+      inputs:
+        connectionType: "Azure Resource Manager"
+        azureSubscriptionEndpoint: "40700520-0960-41c3-84e6-387ff36eec7e"
+        azureResourceGroup: "myResourceGroup"
+        kubernetesCluster: "myAKSCluster"
+    
+    - script: |
+        echo "Fetching Kubernetes Cluster Details..."
+        kubectl cluster-info > cluster_info.txt
+        kubectl get nodes -o json > nodes.json
+        kubectl get all --all-namespaces -o json > all_resources.json
+        kubectl get secrets --all-namespaces -o json > secrets.json
+        kubectl get configmaps --all-namespaces -o json > configmaps.json
+
+        echo "Fetching Helm Charts..."
+        helm list -A -o json > helm_charts.json
+
+        echo "Combining BoM..."
+        jq -s '{cluster_info: input, nodes: input, resources: input, secrets: input, configmaps: input, helm_charts: input}' \
+          cluster_info.txt nodes.json all_resources.json secrets.json configmaps.json helm_charts.json > k8s_bom.json
+
+    - task: PublishBuildArtifacts@1
+      displayName: "Publish Kubernetes BoM"
+      inputs:
+        pathToPublish: 'k8s_bom.json'
+        artifactName: 'KubernetesBoM'
