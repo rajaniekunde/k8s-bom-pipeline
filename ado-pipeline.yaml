@@ -13,7 +13,7 @@ stages:
       displayName: "Connect to AKS"
       inputs:
         connectionType: "Azure Resource Manager"
-        azureSubscriptionEndpoint: "<YOUR_AZURE_SUBSCRIPTION>"
+        azureSubscriptionEndpoint: "40700520-0960-41c3-84e6-387ff36eec7e"
         azureResourceGroup: "myResourceGroup"
         kubernetesCluster: "myAKSCluster"
     
