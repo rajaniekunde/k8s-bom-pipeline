@@ -19,6 +19,9 @@ stages:
         kubernetesCluster: "myAKSCluster"
 
     - script: |
+        echo "Ensuring kubeconfig is set correctly..."
+        export KUBECONFIG=$(Agent.TempDirectory)/kubeconfig
+        echo "Kubeconfig set to: $KUBECONFIG"
         echo "Fetching Kubernetes Cluster Details..."
         kubectl cluster-info > cluster_info.txt
         kubectl get nodes -o json > nodes.json
