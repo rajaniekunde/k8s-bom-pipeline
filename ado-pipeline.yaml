@@ -10,18 +10,13 @@ stages:
   - job: Generate_BoM
     steps:
     
-    - task: AzureCLI@2
-      displayName: "Authenticate with AKS"
+    - task: Kubernetes@1
+      displayName: "Connect to AKS"
       inputs:
-        azureSubscription: "64002c0f-699d-400d-93d2-a40ec1226bcd"
-        scriptType: "bash"
-        scriptLocation: "inlineScript"
-        inlineScript: |
-          echo "Logging into Azure..."
-          az login --service-principal -u $(ARM_CLIENT_ID) -p $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
-          echo "Fetching AKS credentials..."
-          az aks get-credentials --resource-group "myResourceGroup" --name "myAKSCluster" --overwrite-existing
-          kubectl cluster-info
+        connectionType: "Azure Resource Manager"
+        azureSubscriptionEndpoint: "64002c0f-699d-400d-93d2-a40ec1226bcd"
+        azureResourceGroup: "myResourceGroup"
+        kubernetesCluster: "myAKSCluster"
 
     - script: |
         echo "Fetching Kubernetes Cluster Details..."
